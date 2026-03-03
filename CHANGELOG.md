@@ -1,0 +1,44 @@
+# Changelog
+
+## v2.0 (2026)
+
+Complete rewrite from Python 2.7 to Python 3.
+
+### Added
+- PySide6 graphical user interface with real-time progress display
+- Command-line interface with `analyze` and `suite` subcommands
+- Parallel random network generation via `ProcessPoolExecutor`
+- Pickle-based caching for random networks and convergence statistics
+- Excel output for analysis results and suite experiments
+- Network fingerprint JSON storage with correlation table and per-network statistics
+- Multi-format network file support: Pajek (.net), GML, GraphML, edge list, adjacency list
+- CSV edge classification export for Gephi/Cytoscape interoperability
+- Edge type legend on network visualization plots
+- Degree distribution plot (histogram + log-log)
+- Suite experiment chart titles include suite name
+- Suite experiment Excel: network statistics summary sheet (nodes, edges, diameter, etc.)
+- Suite experiment Excel/chart: fingerprints sorted by hierarchical clustering order
+- Node degree and SINK count columns in Excel node information sheet
+- Final edge type column in Excel target network sheet
+- Comprehensive error handling: cache corruption recovery, parallel fallback, color index safety, division-by-zero guards
+- `RuntimeWarning` when degree-preserving edge swap fails
+- Connected components sorted by size (largest = component 1)
+- Detailed algorithm documentation in source code
+
+### Changed
+- All global variables replaced with explicit function parameters
+- Progress reporting via callbacks (supports both GUI and CLI)
+- Modern Python APIs: `nx.Graph.nodes` instead of `nx.Graph.node`, `range` instead of `xrange`, f-strings, dataclasses, type hints
+- Fixed `network_clustering` SINK endpoint removal (py2 had unreachable branch)
+- Fixed node size computation when average information gain is zero
+
+## v1.0 (2012)
+
+Original implementation by Chung-Yuan Huang.
+
+- Core algorithm: hierarchical ego-network edge type analysis
+- Four edge types: BOND, SINK, LOCAL BRIDGE, GLOBAL BRIDGE
+- Statistical adaptive thresholds from random null models
+- Suite experiments for WS and NWS small-world network series
+- Pajek (.net) file I/O
+- Matplotlib visualization
