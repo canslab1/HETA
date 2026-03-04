@@ -37,9 +37,9 @@ dependencies = [
 gui = ["PySide6>=6.5"]
 
 [project.urls]
-Homepage = "https://github.com/<your-username>/HETA"
-Repository = "https://github.com/<your-username>/HETA"
-Issues = "https://github.com/<your-username>/HETA/issues"
+Homepage = "https://github.com/canslab1/HETA"
+Repository = "https://github.com/canslab1/HETA"
+Issues = "https://github.com/canslab1/HETA/issues"
 
 [project.scripts]
 heta = "run_heta:main"

@@ -52,7 +52,7 @@ import networkx as nx
 import numpy as np
 import scipy.cluster.hierarchy as hc
 from dataclasses import dataclass, field
-from typing import Callable, Optional, Dict, List, Any, Tuple
+from typing import Optional, Dict, List, Any
 
 from heta.constants import *
 
@@ -428,8 +428,11 @@ def _generate_random_network(g, layers, Q, cache_path=None):
         rg_data['graph'][GRAPH_KEY_STD_COMMON_NODES + l] = rg.graph[GRAPH_KEY_STD_COMMON_NODES + l]
 
     if cache_path:
-        with open(cache_path, 'wb') as f:
-            pickle.dump(rg_data, f, protocol=pickle.HIGHEST_PROTOCOL)
+        try:
+            with open(cache_path, 'wb') as f:
+                pickle.dump(rg_data, f, protocol=pickle.HIGHEST_PROTOCOL)
+        except OSError:
+            pass  # 快取寫入失敗不影響分析結果
 
     return rg_data
 
@@ -942,10 +945,13 @@ def run_link_analysis(
         ng.add_nodes_from(g.nodes())
         ng.add_edges_from(g.edges(data=True))
         ng.graph['name'] = root + '_' + str(compNo) + '_result' + ext
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', message='.*is not processed.*Non-string attribute.*',
-                                    category=UserWarning)
-            nx.write_pajek(ng, root + '_' + str(compNo) + '_result' + ext)
+        try:
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', message='.*is not processed.*Non-string attribute.*',
+                                        category=UserWarning)
+                nx.write_pajek(ng, root + '_' + str(compNo) + '_result' + ext)
+        except OSError:
+            pass  # 結果檔寫入失敗不影響回傳的分析結果
 
         # 計算佈局
         if path.endswith(tuple(SPECIAL_NETWORKS)):
@@ -1032,12 +1038,15 @@ def _save_fingerprint(network_name, fingerprint, stats=None):
             corr_table[net_name1][net_name2] = 0.0 if np.isnan(c) else float(c)
 
     import json
-    with open(fp_path, 'w') as f:
-        json.dump({
-            'finger_prints': finger_prints,
-            'corr_table': corr_table,
-            'network_stats': network_stats,
-        }, f, indent=2)
+    try:
+        with open(fp_path, 'w') as f:
+            json.dump({
+                'finger_prints': finger_prints,
+                'corr_table': corr_table,
+                'network_stats': network_stats,
+            }, f, indent=2)
+    except OSError:
+        pass  # 指紋快取寫入失敗不影響分析結果
 
 
 def _load_fingerprints():
@@ -1045,11 +1054,14 @@ def _load_fingerprints():
     fp_path = 'network_fingerprints.json'
     if os.path.exists(fp_path):
         import json
-        with open(fp_path, 'r') as f:
-            data = json.load(f)
-        return (data.get('finger_prints', {}),
-                data.get('corr_table', {}),
-                data.get('network_stats', {}))
+        try:
+            with open(fp_path, 'r') as f:
+                data = json.load(f)
+            return (data.get('finger_prints', {}),
+                    data.get('corr_table', {}),
+                    data.get('network_stats', {}))
+        except (json.JSONDecodeError, KeyError, OSError):
+            pass
     return {}, {}, {}
 
 

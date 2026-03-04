@@ -6,7 +6,6 @@ Excel / CSV 輸出模組：使用 openpyxl 取代 xlwt，輸出 .xlsx 格式
 
 import csv
 import networkx as nx
-import numpy as np
 import openpyxl
 from openpyxl.styles import Font, Alignment
 

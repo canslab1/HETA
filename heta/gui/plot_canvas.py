@@ -18,18 +18,7 @@ class PlotCanvas(FigureCanvasQTAgg):
 
     def update_figure(self, new_figure):
         """用新的 Figure 物件取代目前的圖表"""
-        # 清除舊的 axes
-        self.fig.clear()
-
-        # 從新 Figure 複製所有 axes 的內容
         if new_figure is not None:
-            for src_ax in new_figure.axes:
-                # 建立對應的 subplot
-                dest_ax = self.fig.add_subplot(111)
-                # 直接用新 figure 取代
-                break  # 只處理第一個 axes
-
-            # 更好的方式：直接替換整個 figure
             self.fig = new_figure
             self.figure = new_figure
             new_figure.set_canvas(self)

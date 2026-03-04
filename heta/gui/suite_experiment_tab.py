@@ -3,8 +3,6 @@
 批次實驗分頁：套件選擇、執行分析/顯示結果、三種圖表、匯出 Excel
 """
 
-import os
-
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
     QLabel, QPushButton, QFileDialog, QSpinBox,

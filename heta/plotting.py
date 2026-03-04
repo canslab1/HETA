@@ -164,7 +164,11 @@ def create_pagerank_figure(result):
                 if neighbor_key in pg and pair != neighbor_key:
                     pg.add_edge(pair, neighbor_key)
 
-    pr = nx.pagerank(pg, max_iter=2000)
+    try:
+        pr = nx.pagerank(pg, max_iter=2000)
+    except nx.PowerIterationFailedConvergence:
+        # 收斂失敗時使用均勻權重
+        pr = {key: 1.0 / len(pg) for key in pg.nodes()}
     for key in list(pr.keys()):
         pr[key] = round(pr[key], 4)
 
@@ -383,7 +387,6 @@ def create_dendrogram_figure(suite_result, suite_name=''):
         fig.set_tight_layout(True)
         return fig
 
-    corr_matrix = suite_result.corr_matrix
     # 需要從原始 corr_table 重建未排序矩陣
     # 使用 bar_data 反推指紋向量做 linkage
     fingerprint_vectors = []

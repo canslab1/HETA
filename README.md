@@ -28,7 +28,7 @@ GLOBAL BRIDGE   ─── Long-range connection between distant communities
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/HETA.git
+git clone https://github.com/canslab1/HETA.git
 cd HETA
 pip install -r requirements.txt
 ```

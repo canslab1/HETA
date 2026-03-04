@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.0.1 (2026-03)
+
+Code quality and robustness improvements.
+
+### Fixed
+- Removed unused imports across multiple modules (engine.py, excel_writer.py, main_window.py, suite_experiment_tab.py)
+- Removed dead code block in `PlotCanvas.update_figure()` (plot_canvas.py)
+- Added error handling for corrupted fingerprint JSON files (`_load_fingerprints`)
+- Added `OSError` handling for pickle cache writes, fingerprint JSON saves, and Pajek result file writes
+- Added `PowerIterationFailedConvergence` fallback in PageRank plot (uniform weight when convergence fails)
+- Fixed GitHub URLs in README.md and pyproject.toml (replaced placeholder with actual repository URL)
+
 ## v2.0 (2026)
 
 Complete rewrite from Python 2.7 to Python 3.

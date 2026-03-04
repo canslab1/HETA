@@ -4,16 +4,14 @@ PySide6 主視窗：包含連結分析和批次實驗兩個分頁
 """
 
 import sys
-import os
 
 import matplotlib
 matplotlib.use('QtAgg')
 
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QProgressBar,
-    QMessageBox, QMenuBar,
+    QMessageBox,
 )
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 
 from heta.gui.link_analysis_tab import LinkAnalysisTab
