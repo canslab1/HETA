@@ -203,6 +203,10 @@ HETA/
 Original implementation: March 2012 (Python 2.7)
 Current version: 2.0 (Python 3, 2026)
 
+## References
+
+1. Huang, C.-Y., Chin, W. C. B., Fu, Y.-H., & Tsai, Y.-S. (2019). Beyond bond links in complex networks: Local bridges, global bridges and silk links. *Physica A: Statistical Mechanics and its Applications*, 536, 121027. https://doi.org/10.1016/j.physa.2019.04.263
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
