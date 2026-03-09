@@ -109,28 +109,6 @@ Options:
   -d, --debug                      Print debug messages
 ```
 
-## Output
-
-For each analyzed network component, HETA produces:
-
-| File | Description |
-|------|-------------|
-| `*_result.net` | Pajek file with edge classifications |
-| `*_result.png` | Network visualization colored by edge type (with legend) |
-| `*_result.xlsx` | Detailed results: edge data, random networks, node information |
-| `*_edges.csv` | Edge classification CSV (with `--export-csv`), importable by Gephi/Cytoscape |
-
-Optional plots (enabled by `--show-*` flags): degree distribution, betweenness centrality, PageRank, clustering, per-layer detail.
-
-Suite experiments additionally produce:
-
-| File | Description |
-|------|-------------|
-| `fingerprints_*.png` | Stacked bar chart of edge type proportions |
-| `correlation_*.png` | Fingerprint correlation heatmap |
-| `hierarchy_*.png` | Hierarchical clustering dendrogram |
-| `suite_result_*.xlsx` | Fingerprints, correlation matrix, and network statistics |
-
 ## Sample Networks
 
 HETA ships with three sets of sample networks:
@@ -199,6 +177,28 @@ HETA/
 ├── ws_swn/                  # Watts-Strogatz suite networks
 └── nws_swn/                 # Newman-Watts-Strogatz suite networks
 ```
+
+## Output
+
+For each analyzed network component, HETA produces:
+
+| File | Description |
+|------|-------------|
+| `*_result.net` | Pajek file with edge classifications |
+| `*_result.png` | Network visualization colored by edge type (with legend) |
+| `*_result.xlsx` | Detailed results: edge data, random networks, node information |
+| `*_edges.csv` | Edge classification CSV (with `--export-csv`), importable by Gephi/Cytoscape |
+
+Optional plots (enabled by `--show-*` flags): degree distribution, betweenness centrality, PageRank, clustering, per-layer detail.
+
+Suite experiments additionally produce:
+
+| File | Description |
+|------|-------------|
+| `fingerprints_*.png` | Stacked bar chart of edge type proportions |
+| `correlation_*.png` | Fingerprint correlation heatmap |
+| `hierarchy_*.png` | Hierarchical clustering dendrogram |
+| `suite_result_*.xlsx` | Fingerprints, correlation matrix, and network statistics |
 
 ## Authors
 
