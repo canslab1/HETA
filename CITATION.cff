@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+title: >-
+  HETA: Hierarchical Edge Type Analysis
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Chung-Yuan
+    family-names: Huang
+    affiliation: >-
+      Department of Computer Science and Information
+      Engineering, Chang Gung University, Taiwan
+    email: gscott@mail.cgu.edu.tw
+repository-code: 'https://github.com/canslab1/HETA'
+url: 'https://github.com/canslab1/HETA'
+abstract: >-
+  A topology-driven tool for classifying every edge in a
+  complex network into one of four structural types (BOND,
+  SINK, LOCAL BRIDGE, GLOBAL BRIDGE) without requiring any
+  pre-defined community labels or edge weights.
+keywords:
+  - network analysis
+  - complex networks
+  - edge classification
+  - community detection
+  - graph theory
+license: MIT
+version: 2.0.0
+date-released: '2026-01-01'
+preferred-citation:
+  type: article
+  authors:
+    - given-names: Chung-Yuan
+      family-names: Huang
+    - given-names: Wei-Chien-Benny
+      family-names: Chin
+    - given-names: Yu-Hsiang
+      family-names: Fu
+    - given-names: Yu-Shiuan
+      family-names: Tsai
+  title: >-
+    Beyond bond links in complex networks: Local bridges,
+    global bridges and silk links
+  journal: "Physica A: Statistical Mechanics and its Applications"
+  year: 2019
+  volume: '536'
+  pages: '121027'
+  doi: 10.1016/j.physa.2019.04.263
