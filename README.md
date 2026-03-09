@@ -12,6 +12,12 @@ LOCAL BRIDGE    ─── Inter-cluster connection between nearby communities
 GLOBAL BRIDGE   ─── Long-range connection between distant communities
 ```
 
+## Overview
+
+In complex networks, not all links serve the same structural role. Some reinforce tight-knit communities, while others bridge distant clusters. Understanding these roles is essential for community detection, influence propagation analysis, and network resilience studies.
+
+HETA classifies every edge in an undirected network into one of four hierarchical types based purely on topology — no community labels, edge weights, or parameter tuning required. By constructing multi-layer ego networks and comparing neighborhood overlap against a statistical null model, HETA produces a 4D "network fingerprint" that characterizes the structural composition of any network.
+
 ## Features
 
 - **Parameter-free** — Classification is driven entirely by network topology; no community count, edge weight, or manual threshold required.
@@ -194,14 +200,11 @@ HETA/
 └── nws_swn/                 # Newman-Watts-Strogatz suite networks
 ```
 
-## Author
+## Authors
 
-**Chung-Yuan Huang** (&thinsp;黃崇源&thinsp;)
-&ensp; gscott@mail.cgu.edu.tw
-&ensp; Chang Gung University, Taiwan
+- **Chung-Yuan Huang** (黃崇源) — Department of Computer Science and Information Engineering, Chang Gung University, Taiwan (gscott@mail.cgu.edu.tw)
 
-Original implementation: March 2012 (Python 2.7)
-Current version: 2.0 (Python 3, 2026)
+Original implementation: March 2012 (Python 2.7); Current version: 2.0 (Python 3, 2026)
 
 ## References
 
