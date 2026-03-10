@@ -1,6 +1,10 @@
 # Changelog
 
-## v2.0.1 (2026-03)
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## v2.0.1 (2026-03-10)
 
 Code quality and robustness improvements.
 
@@ -12,7 +16,7 @@ Code quality and robustness improvements.
 - Added `PowerIterationFailedConvergence` fallback in PageRank plot (uniform weight when convergence fails)
 - Fixed GitHub URLs in README.md and pyproject.toml (replaced placeholder with actual repository URL)
 
-## v2.0 (2026)
+## v2.0.0 (2026-01-01)
 
 Complete rewrite from Python 2.7 to Python 3.
 
@@ -44,7 +48,7 @@ Complete rewrite from Python 2.7 to Python 3.
 - Fixed `network_clustering` SINK endpoint removal (py2 had unreachable branch)
 - Fixed node size computation when average information gain is zero
 
-## v1.0 (2012)
+## v1.0.0 (2012)
 
 Original implementation by Chung-Yuan Huang.
 

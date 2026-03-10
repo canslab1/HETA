@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heta"
-version = "2.0.0"
+version = "2.0.1"
 description = "Hierarchical Edge Type Analysis — classify edges in complex networks into BOND, SINK, LOCAL BRIDGE, and GLOBAL BRIDGE"
 readme = "README.md"
 license = {text = "MIT"}

@@ -204,7 +204,13 @@ Suite experiments additionally produce:
 
 - **Chung-Yuan Huang** (黃崇源) — Department of Computer Science and Information Engineering, Chang Gung University, Taiwan (gscott@mail.cgu.edu.tw)
 
-Original implementation: March 2012 (Python 2.7); Current version: 2.0 (Python 3, 2026)
+## Citation
+
+If you use this software in your research, please cite:
+
+> Huang, C.-Y., Chin, W. C. B., Fu, Y.-H., & Tsai, Y.-S. (2019). Beyond bond links in complex networks: Local bridges, global bridges and silk links. *Physica A: Statistical Mechanics and its Applications*, 536, 121027. https://doi.org/10.1016/j.physa.2019.04.263
+
+See `CITATION.cff` for machine-readable citation metadata.
 
 ## References
 
