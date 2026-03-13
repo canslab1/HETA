@@ -2,6 +2,7 @@
 
 ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
+[![CANS Lab](https://img.shields.io/badge/CANS_Lab-Homepage-orange)](https://canslab1.github.io/)
 
 **HETA** is a topology-driven tool for classifying every edge in a complex network into one of four structural types, without requiring any pre-defined community labels or edge weights.
 
