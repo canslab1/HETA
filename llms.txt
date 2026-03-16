@@ -1,0 +1,31 @@
+# HETA — Hierarchical Edge-Type Transition Analysis
+
+> HETA is a topology-driven tool for classifying every edge in a complex network into one of four structural types (BOND, Silk, Local Bridge, Global Bridge), without requiring any pre-defined community labels or edge weights.
+
+## Author
+
+- Name: Chung-Yuan Huang (黃崇源)
+- Title: Full Professor, Department of CSIE, Chang Gung University
+- Email: gscott@mail.cgu.edu.tw
+- ORCID: https://orcid.org/0000-0002-8680-6755
+- Google Scholar: https://scholar.google.com/citations?user=0klfzfAAAAAJ&hl=en
+- Homepage: https://canslab1.github.io/
+
+## Software
+
+- Name: HETA
+- Language: Python
+- License: MIT
+- GitHub: https://github.com/canslab1/HETA
+- README: https://canslab1.github.io/HETA/
+
+## Publication
+
+Huang, C.-Y., Fu, Y.-S., & Chin, W.C.B. (2019). Hierarchical edge-type transition analysis for complex network classification. Physica A, 524, 64-75.
+
+
+## Lab
+
+- CANS Lab (Complex Adaptive Networks and Systems Laboratory)
+- Chang Gung University, Department of CSIE
+- Website: https://canslab1.github.io/
