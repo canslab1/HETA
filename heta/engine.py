@@ -575,169 +575,179 @@ def run_link_analysis(
         else:
             layers = max(1, int(g.graph[GRAPH_KEY_SHORTEST_PATH] / 2.0))
 
+        # ================================================================
+        # 樹狀圖前置偵測（Tree fast-path）
+        # ================================================================
+        # 連通圖的邊數 = 節點數 - 1 ⇔ 樹（無環）。O(1) 判定。
+        #
+        # 樹的結構特性使 HETA 的核心機制退化：
+        # - 所有邊的鄰域重疊度 = 0（任意兩端點永遠沒有共同鄰居）
+        # - 隨機網路生成（connected_double_edge_swap）會失敗（樹的每條
+        #   邊都是拓撲橋，swap 後必然斷裂或仍為樹），導致 1000 次生成
+        #   全部回傳與原圖相同的結果，浪費數分鐘計算時間。
+        # - R1 = mean(0) + 2×mean(0) = 0，使 0 >= 0 為真，所有非 SINK
+        #   邊被錯誤判定為 BOND（語意上完全相反——樹的每條邊都是橋）。
+        #
+        # 快速路徑直接分類：degree-1 邊 → SINK，其餘 → GLOBAL_BRIDGE，
+        # 跳過 ego network 建構、隨機網路生成、R1/R2 門檻計算。
+        # Phase 4（資訊熵）與 Phase 5（網絡指紋）仍正常執行。
+        is_tree = (g.size() == g.order() - 1)
+
         # 計算每條邊在各層的鄰域重疊度（核心特徵提取）
-        compute_link_property(g, layers)
+        if not is_tree:
+            compute_link_property(g, layers)
 
         t_start = time.time()
         Q = 100
 
-        if progress_callback:
-            progress_callback(0, times, f"Component {compNo}: generating random networks...")
-
-        # 產生供比較用的隨機網絡
-        cache_dir = os.path.join(head, '.heta_cache') if head else '.heta_cache'
-        os.makedirs(cache_dir, exist_ok=True)
-
-        # Phase 1: 載入已快取的隨機網絡
-        rgs = [None] * times
-        uncached_tasks = []
-        cached_count = 0
-
-        for c in range(times):
-            cp = os.path.join(cache_dir, f'{tail}_{compNo}_{c}.pkl')
-            if os.path.exists(cp):
-                debugmsg(f'read random network #{c} from cache...', debug)
-                try:
-                    with open(cp, 'rb') as f:
-                        rgs[c] = pickle.load(f)
-                    cached_count += 1
-                except (pickle.UnpicklingError, EOFError, OSError, Exception):
-                    debugmsg(f'cache file #{c} corrupted, will regenerate', debug)
-                    uncached_tasks.append((c, cp))
-            else:
-                uncached_tasks.append((c, cp))
-
-        if cached_count > 0:
-            debugmsg(f'loaded {cached_count} random networks from cache', debug)
+        if is_tree:
+            # 樹快速路徑：跳過 ego network、隨機網路、R1/R2 計算
+            debugmsg('tree detected (|E|=|V|-1), skipping random network generation...', debug)
+            thresholds_r1 = {}
+            thresholds_r2 = {}
+            actual_times = 0
             if progress_callback:
-                progress_callback(cached_count, times,
-                    f"Component {compNo}: loaded {cached_count} from cache")
+                progress_callback(times, times, f"Component {compNo}: tree detected, skipping random networks")
+        else:
+            if progress_callback:
+                progress_callback(0, times, f"Component {compNo}: generating random networks...")
 
-        # Phase 2: 生成未快取的隨機網絡
-        if uncached_tasks:
-            if parallel and len(uncached_tasks) > 1:
-                # === 平行模式 ===
-                cpu_count = os.cpu_count() or 4
-                actual_workers = workers or max(1, cpu_count - 1)
-                actual_workers = min(actual_workers, len(uncached_tasks))
-                debugmsg(f'generating {len(uncached_tasks)} random networks '
-                         f'in parallel ({actual_workers} workers)...', debug)
+        if not is_tree:
+            # 產生供比較用的隨機網絡
+            cache_dir = os.path.join(head, '.heta_cache') if head else '.heta_cache'
+            os.makedirs(cache_dir, exist_ok=True)
 
-                # 建立輕量級圖形副本：只保留節點和邊的結構
-                # 去除 compute_link_property 計算的 ego network 等大量屬性，
-                # 大幅減少 spawn 序列化開銷
-                g_for_workers = nx.Graph()
-                g_for_workers.add_nodes_from(g.nodes())
-                g_for_workers.add_edges_from(g.edges())
+            # Phase 1: 載入已快取的隨機網絡
+            rgs = [None] * times
+            uncached_tasks = []
+            cached_count = 0
 
-                # 使用 spawn context 避免 fork + Qt/GUI 死鎖問題
-                # fork 會繼承父程序的 Qt 內部執行緒鎖，導致子程序 deadlock
-                # spawn 建立全新程序，安全且為 Python 3.14+ 預設方式
-                try:
-                    mp_ctx = mp.get_context('spawn')
-                except ValueError:
-                    mp_ctx = None
-                with ProcessPoolExecutor(max_workers=actual_workers,
-                                         mp_context=mp_ctx) as executor:
-                    future_to_idx = {}
-                    for idx, cp in uncached_tasks:
-                        future = executor.submit(
-                            _generate_random_network, g_for_workers,
-                            layers, Q, cp)
-                        future_to_idx[future] = idx
+            for c in range(times):
+                cp = os.path.join(cache_dir, f'{tail}_{compNo}_{c}.pkl')
+                if os.path.exists(cp):
+                    debugmsg(f'read random network #{c} from cache...', debug)
+                    try:
+                        with open(cp, 'rb') as f:
+                            rgs[c] = pickle.load(f)
+                        cached_count += 1
+                    except (pickle.UnpicklingError, EOFError, OSError, Exception):
+                        debugmsg(f'cache file #{c} corrupted, will regenerate', debug)
+                        uncached_tasks.append((c, cp))
+                else:
+                    uncached_tasks.append((c, cp))
 
-                    done_count = 0
-                    for future in as_completed(future_to_idx):
-                        idx = future_to_idx[future]
-                        try:
-                            rgs[idx] = future.result()
-                        except Exception as e:
-                            debugmsg(f'parallel worker error #{idx}: {e}, '
-                                     f'falling back to serial...', debug)
-                            cp = os.path.join(cache_dir,
-                                f'{tail}_{compNo}_{idx}.pkl')
+            if cached_count > 0:
+                debugmsg(f'loaded {cached_count} random networks from cache', debug)
+                if progress_callback:
+                    progress_callback(cached_count, times,
+                        f"Component {compNo}: loaded {cached_count} from cache")
+
+            # Phase 2: 生成未快取的隨機網絡
+            if uncached_tasks:
+                if parallel and len(uncached_tasks) > 1:
+                    # === 平行模式 ===
+                    cpu_count = os.cpu_count() or 4
+                    actual_workers = workers or max(1, cpu_count - 1)
+                    actual_workers = min(actual_workers, len(uncached_tasks))
+                    debugmsg(f'generating {len(uncached_tasks)} random networks '
+                             f'in parallel ({actual_workers} workers)...', debug)
+
+                    # 建立輕量級圖形副本：只保留節點和邊的結構
+                    # 去除 compute_link_property 計算的 ego network 等大量屬性，
+                    # 大幅減少 spawn 序列化開銷
+                    g_for_workers = nx.Graph()
+                    g_for_workers.add_nodes_from(g.nodes())
+                    g_for_workers.add_edges_from(g.edges())
+
+                    # 使用 spawn context 避免 fork + Qt/GUI 死鎖問題
+                    # fork 會繼承父程序的 Qt 內部執行緒鎖，導致子程序 deadlock
+                    # spawn 建立全新程序，安全且為 Python 3.14+ 預設方式
+                    try:
+                        mp_ctx = mp.get_context('spawn')
+                    except ValueError:
+                        mp_ctx = None
+                    with ProcessPoolExecutor(max_workers=actual_workers,
+                                             mp_context=mp_ctx) as executor:
+                        future_to_idx = {}
+                        for idx, cp in uncached_tasks:
+                            future = executor.submit(
+                                _generate_random_network, g_for_workers,
+                                layers, Q, cp)
+                            future_to_idx[future] = idx
+
+                        done_count = 0
+                        for future in as_completed(future_to_idx):
+                            idx = future_to_idx[future]
                             try:
-                                rgs[idx] = _generate_random_network(
-                                    g, layers, Q, cp)
-                            except Exception as e2:
-                                debugmsg(f'serial fallback also failed #{idx}: {e2}', debug)
-                                rgs[idx] = None
+                                rgs[idx] = future.result()
+                            except Exception as e:
+                                debugmsg(f'parallel worker error #{idx}: {e}, '
+                                         f'falling back to serial...', debug)
+                                cp = os.path.join(cache_dir,
+                                    f'{tail}_{compNo}_{idx}.pkl')
+                                try:
+                                    rgs[idx] = _generate_random_network(
+                                        g, layers, Q, cp)
+                                except Exception as e2:
+                                    debugmsg(f'serial fallback also failed #{idx}: {e2}', debug)
+                                    rgs[idx] = None
 
-                        done_count += 1
+                            done_count += 1
+                            if progress_callback:
+                                progress_callback(
+                                    cached_count + done_count, times,
+                                    f"Component {compNo}: network "
+                                    f"{cached_count + done_count}/{times} "
+                                    f"(parallel, {actual_workers} workers)")
+
+                    t_elapsed = time.time() - t_start
+                    debugmsg(f'parallel generation done in {t_elapsed:.2f}s '
+                             f'({actual_workers} workers)', debug)
+                else:
+                    # === 序列模式 ===
+                    for i, (idx, cp) in enumerate(uncached_tasks):
+                        debugmsg(f'create and analyse random network #{idx}...',
+                                 debug)
+                        rgs[idx] = _generate_random_network(g, layers, Q, cp)
+
                         if progress_callback:
                             progress_callback(
-                                cached_count + done_count, times,
-                                f"Component {compNo}: network "
-                                f"{cached_count + done_count}/{times} "
-                                f"(parallel, {actual_workers} workers)")
+                                cached_count + i + 1, times,
+                                f"Component {compNo}: random network "
+                                f"{cached_count + i + 1}/{times}")
 
-                t_elapsed = time.time() - t_start
-                debugmsg(f'parallel generation done in {t_elapsed:.2f}s '
-                         f'({actual_workers} workers)', debug)
-            else:
-                # === 序列模式 ===
-                for i, (idx, cp) in enumerate(uncached_tasks):
-                    debugmsg(f'create and analyse random network #{idx}...',
-                             debug)
-                    rgs[idx] = _generate_random_network(g, layers, Q, cp)
+                        debugmsg(f'+--- * Time spent: '
+                                 f'{time.time() - t_start:.4f}s', debug)
+                        t_start = time.time()
 
-                    if progress_callback:
-                        progress_callback(
-                            cached_count + i + 1, times,
-                            f"Component {compNo}: random network "
-                            f"{cached_count + i + 1}/{times}")
+            rgs = [r for r in rgs if r is not None]
+            actual_times = len(rgs)
+            if actual_times == 0:
+                raise RuntimeError(
+                    f"Component {compNo}: all random network generations failed, "
+                    f"cannot compute thresholds"
+                )
 
-                    debugmsg(f'+--- * Time spent: '
-                             f'{time.time() - t_start:.4f}s', debug)
-                    t_start = time.time()
-
-        rgs = [r for r in rgs if r is not None]
-        actual_times = len(rgs)
-        if actual_times == 0:
-            raise RuntimeError(
-                f"Component {compNo}: all random network generations failed, "
-                f"cannot compute thresholds"
-            )
-
-        # ================================================================
-        # R1 門檻值：從 null model 導出 BOND / bridge 的分界線
-        # ================================================================
-        # 對每一層 l，彙總所有隨機網絡在該層的 (avg, std) 統計量，計算：
-        #
-        #   R1(l) = mean(random_avg_l) + 2 × mean(random_std_l)
-        #
-        # 統計意義：
-        # - 在隨機網絡中，邊的重疊度近似常態分佈。R1 相當於 μ + 2σ，
-        #   即隨機期望的「上界」。
-        # - 若一條邊的實際重疊度 ≥ R1，表示它的鄰域重疊「顯著高於隨機」，
-        #   意味著兩端節點嵌入同一個結構緊密的社群 → 分類為 BOND。
-        # - 若低於 R1，則該重疊度在隨機網絡中也可能出現 → 可能是 bridge。
-        #
-        # 設計取捨：
-        # - 使用 2σ 而非 1σ 或 3σ：2σ 涵蓋約 95% 的隨機分佈，在靈敏度
-        #   與特異度之間取得平衡。1σ 會將過多邊判為 BOND（假陽性高），
-        #   3σ 則過於嚴格（許多明顯的社群內邊會被誤判為 bridge）。
-        # - R1 上限 clamp 至 1.0：因為重疊度的理論上界為 1，超過 1 的門檻
-        #   會使所有邊都無法通過，失去意義。
-        # - 每一層有獨立的 R1：不同半徑下的隨機基準線不同，這使得多層
-        #   分析能在每個尺度上自適應地判斷。
-        debugmsg('generate a threshold for BOND/bridge link analysis...', debug)
-        thresholds_r1 = {}
-        thresholds_r2 = {}
-        for i in range(layers):
-            l = str(i + 1)
-            g.graph[GRAPH_KEY_AVG_LIST + l] = []
-            g.graph[GRAPH_KEY_STD_LIST + l] = []
-            for j in range(actual_times):
-                g.graph[GRAPH_KEY_AVG_LIST + l].append(rgs[j]['graph'][GRAPH_KEY_AVG_COMMON_NODES + l])
-                g.graph[GRAPH_KEY_STD_LIST + l].append(rgs[j]['graph'][GRAPH_KEY_STD_COMMON_NODES + l])
-            g.graph[GRAPH_KEY_THRESHOLD_R1 + l] = (
-                np.mean(g.graph[GRAPH_KEY_AVG_LIST + l]) +
-                2 * np.mean(g.graph[GRAPH_KEY_STD_LIST + l])
-            )
-            if g.graph[GRAPH_KEY_THRESHOLD_R1 + l] > 1:
-                g.graph[GRAPH_KEY_THRESHOLD_R1 + l] = 1.0
-            thresholds_r1[l] = g.graph[GRAPH_KEY_THRESHOLD_R1 + l]
+            # ============================================================
+            # R1 門檻值：從 null model 導出 BOND / bridge 的分界線
+            # ============================================================
+            debugmsg('generate a threshold for BOND/bridge link analysis...', debug)
+            thresholds_r1 = {}
+            thresholds_r2 = {}
+            for i in range(layers):
+                l = str(i + 1)
+                g.graph[GRAPH_KEY_AVG_LIST + l] = []
+                g.graph[GRAPH_KEY_STD_LIST + l] = []
+                for j in range(actual_times):
+                    g.graph[GRAPH_KEY_AVG_LIST + l].append(rgs[j]['graph'][GRAPH_KEY_AVG_COMMON_NODES + l])
+                    g.graph[GRAPH_KEY_STD_LIST + l].append(rgs[j]['graph'][GRAPH_KEY_STD_COMMON_NODES + l])
+                g.graph[GRAPH_KEY_THRESHOLD_R1 + l] = (
+                    np.mean(g.graph[GRAPH_KEY_AVG_LIST + l]) +
+                    2 * np.mean(g.graph[GRAPH_KEY_STD_LIST + l])
+                )
+                if g.graph[GRAPH_KEY_THRESHOLD_R1 + l] > 1:
+                    g.graph[GRAPH_KEY_THRESHOLD_R1 + l] = 1.0
+                thresholds_r1[l] = g.graph[GRAPH_KEY_THRESHOLD_R1 + l]
 
         # ================================================================
         # 五階段邊分類（Phase 1 ~ Phase 5）
@@ -768,80 +778,72 @@ def run_link_analysis(
             else:
                 g[s][t][EDGE_KEY_NEXT_STEP] = PASS
 
-        # Phase 2: BOND vs LOCAL_BRIDGE — 逐層精煉分類
-        # --------------------------------------------------------
-        # 對每一層 l（從第 1 層到第 layers 層），依序判斷尚未確定的邊：
-        #
-        # (a) 重疊度 ≥ R1(l) → BOND，設為 STOP
-        #     在此層，邊的鄰域重疊顯著高於隨機基準線，確認為社群內的
-        #     冗餘連結。BOND 在較淺層確認的，線寬設定較粗（反映「在較
-        #     近的視角下就已經很明顯」）。
-        #
-        # (b) 重疊度 < R1(l) → 暫標為 LOCAL_BRIDGE of layer l
-        #     這些邊在此層未通過 BOND 門檻，但尚不確定是 local 還是
-        #     global bridge。它們的重疊度被收集起來，用於計算 R2 門檻。
-        #
-        # R2 門檻（LOCAL_BRIDGE vs GLOBAL_BRIDGE 的分界線）：
-        #   R2(l) = mean(pass_values) - 1 × std(pass_values)
-        #
-        #   與 R1 不同，R2 不來自 null model，而是來自「當前層未通過 R1
-        #   的邊」自身的分佈。R2 的目的是在 bridge 群體中進一步區分：
-        #   - 重疊度 > R2 → LOCAL_BRIDGE（仍有一定的鄰域共享，是鄰近
-        #     社群之間的橋接），設為 STOP
-        #   - 重疊度 ≤ R2 → 繼續 PASS 到下一層，或最終成為 GLOBAL_BRIDGE
-        #
-        #   設計取捨：R2 使用 mean - 1σ（而非 R1 的 mean + 2σ），因為
-        #   目的不同。R1 要找「顯著高於隨機」的邊；R2 要找「在 bridge
-        #   群體中仍算相對高」的邊。mean - 1σ 篩出分佈中的下尾約 16%
-        #   作為最弱的 bridge（潛在的 global bridge）。
-        #   R2 下限 clamp 至 0.0：負值無意義（重疊度最小為 0）。
-        #
-        # 多層精煉的優勢：
-        # - 一條邊在第 1 層可能低於 R1（看起來像 bridge），但在第 2 層
-        #   的重疊度提高並超過 R1 → 最終被正確歸為 BOND。
-        # - 這使分類能在多個尺度上驗證，避免單一尺度的誤判。
-        n = '1'  # 預設值，如果 layers 為 0 不會進入迴圈
-        for i in range(layers):
-            l = -(i + 1)        # 邊屬性的 key：-1, -2, ...（對應第 1, 2, ... 層）
-            n = str(i + 1)
-            g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n] = []
+        if not is_tree:
+            # Phase 2: BOND vs LOCAL_BRIDGE — 逐層精煉分類
+            # --------------------------------------------------------
+            # 對每一層 l（從第 1 層到第 layers 層），依序判斷尚未確定的邊：
+            #
+            # (a) 重疊度 ≥ R1(l) → BOND，設為 STOP
+            # (b) 重疊度 < R1(l) → 暫標為 LOCAL_BRIDGE of layer l
+            #     R2(l) = mean(pass_values) - 1σ 進一步區分 LOCAL/GLOBAL
+            n = '1'  # 預設值，如果 layers 為 0 不會進入迴圈
+            for i in range(layers):
+                l = -(i + 1)
+                n = str(i + 1)
+                g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n] = []
 
-            for s, t in g.edges():
-                if g[s][t][EDGE_KEY_NEXT_STEP] == STOP:
-                    # 已確定的邊：複製前一層的標籤，不重新判斷
-                    g[s][t][EDGE_KEY_LAYER + n] = g[s][t][EDGE_KEY_LAYER + str(i)]
-                elif g[s][t][l] > g.graph[GRAPH_KEY_THRESHOLD_R1 + n]:
-                    # 重疊度 > R1 → BOND
-                    g[s][t][EDGE_KEY_LAYER + n] = BOND
-                    g[s][t][EDGE_KEY_NEXT_STEP] = STOP
-                    g[s][t][EDGE_KEY_WIDTH] = (layers - i + 1) * BOND_BASIC_WIDTH
-                    g[s][t][EDGE_KEY_COLOR] = BOND_COLOR
-                    g.graph[BOND] += 1
-                else:
-                    # 重疊度 < R1 → 暫標為 local bridge，等待 R2 進一步篩選
-                    g[s][t][EDGE_KEY_LAYER + n] = LOCAL_BRIDGE + ' of layer ' + n
-                    g[s][t][EDGE_KEY_WIDTH] = (layers - i + 1) * BRIDGE_BASIC_WIDTH
-                    g[s][t][EDGE_KEY_COLOR] = LOCAL_BRIDGE_COLOR
-                    g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n].append(g[s][t][l])
-
-            # 從當前層的 bridge 候選值動態計算 R2
-            if len(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n]) == 0:
-                g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = 0
-            else:
-                g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = (
-                    np.mean(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n]) -
-                    np.std(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n])
-                )
-                if g.graph[GRAPH_KEY_THRESHOLD_R2 + n] < 0:
-                    g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = 0.0
-                # 重疊度 > R2 的邊確認為 LOCAL_BRIDGE
                 for s, t in g.edges():
-                    if g[s][t][EDGE_KEY_NEXT_STEP] == PASS:
-                        if g[s][t][l] > g.graph[GRAPH_KEY_THRESHOLD_R2 + n]:
-                            g[s][t][EDGE_KEY_NEXT_STEP] = STOP
-                            g.graph[LOCAL_BRIDGE] += 1
+                    if g[s][t][EDGE_KEY_NEXT_STEP] == STOP:
+                        g[s][t][EDGE_KEY_LAYER + n] = g[s][t][EDGE_KEY_LAYER + str(i)]
+                    elif g[s][t][l] >= g.graph[GRAPH_KEY_THRESHOLD_R1 + n]:
+                        # 重疊度 ≥ R1 → BOND
+                        g[s][t][EDGE_KEY_LAYER + n] = BOND
+                        g[s][t][EDGE_KEY_NEXT_STEP] = STOP
+                        g[s][t][EDGE_KEY_WIDTH] = (layers - i + 1) * BOND_BASIC_WIDTH
+                        g[s][t][EDGE_KEY_COLOR] = BOND_COLOR
+                        g.graph[BOND] += 1
+                    else:
+                        g[s][t][EDGE_KEY_LAYER + n] = LOCAL_BRIDGE + ' of layer ' + n
+                        g[s][t][EDGE_KEY_WIDTH] = (layers - i + 1) * BRIDGE_BASIC_WIDTH
+                        g[s][t][EDGE_KEY_COLOR] = LOCAL_BRIDGE_COLOR
+                        g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n].append(g[s][t][l])
 
-            thresholds_r2[n] = g.graph[GRAPH_KEY_THRESHOLD_R2 + n]
+                # 從當前層的 bridge 候選值動態計算 R2
+                if len(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n]) == 0:
+                    g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = 0
+                else:
+                    g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = (
+                        np.mean(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n]) -
+                        np.std(g.graph[GRAPH_KEY_PASS_TO_NEXT_LAYER + n])
+                    )
+                    if g.graph[GRAPH_KEY_THRESHOLD_R2 + n] < 0:
+                        g.graph[GRAPH_KEY_THRESHOLD_R2 + n] = 0.0
+                    for s, t in g.edges():
+                        if g[s][t][EDGE_KEY_NEXT_STEP] == PASS:
+                            if g[s][t][l] > g.graph[GRAPH_KEY_THRESHOLD_R2 + n]:
+                                g[s][t][EDGE_KEY_NEXT_STEP] = STOP
+                                g.graph[LOCAL_BRIDGE] += 1
+
+                thresholds_r2[n] = g.graph[GRAPH_KEY_THRESHOLD_R2 + n]
+
+        else:
+            # 樹快速路徑：所有非 SINK 邊 → GLOBAL_BRIDGE
+            # 設定每一層的重疊度 = 0 與分類標籤（供 excel_writer 逐層輸出）
+            for s, t in g.edges():
+                if g[s][t][EDGE_KEY_NEXT_STEP] == PASS:
+                    for k in range(1, layers + 1):
+                        g[s][t][-k] = 0.0
+                        g[s][t][EDGE_KEY_LAYER + str(k)] = GLOBAL_BRIDGE
+                    g[s][t][EDGE_KEY_NEXT_STEP] = STOP
+                    g[s][t][EDGE_KEY_WIDTH] = BRIDGE_BASIC_WIDTH
+                    g[s][t][EDGE_KEY_COLOR] = GLOBAL_BRIDGE_COLOR
+                    g.graph[GLOBAL_BRIDGE] += 1
+                else:
+                    # SINK 邊：複製標籤到每一層
+                    for k in range(1, layers + 1):
+                        g[s][t][-k] = 0.0
+                        g[s][t][EDGE_KEY_LAYER + str(k)] = SINK
+            n = str(layers)
 
         # Phase 3: GLOBAL_BRIDGE — 收網
         # --------------------------------------------------------

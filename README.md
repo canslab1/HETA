@@ -221,7 +221,7 @@ See `CITATION.cff` for machine-readable citation metadata.
 
 ### v2.1.0 (2026-04-01)
 
-- **Fix R1 BOND threshold operator**: Changed the R1 comparison from `>=` to strict `>` (overlap must *strictly exceed* the null-model baseline to qualify as BOND). This corrects the classification behavior on tree-like networks where both the observed overlap and R1 are zero: previously `0 >= 0` incorrectly classified all edges as BOND; now `0 > 0` correctly lets them flow through to GLOBAL BRIDGE. The change has negligible impact on general networks (exact floating-point equality with R1 is extremely rare) and aligns the R1 operator with R2, which already uses strict `>`.
+- **Tree network fast-path**: Added O(1) tree detection (`|E| = |V| - 1`) before the heavy computation pipeline. Tree-structured networks bypass ego-network construction, random network generation, and R1/R2 threshold computation entirely — edges are classified directly as SINK (degree-1) or GLOBAL BRIDGE (all others). This fixes incorrect BOND classification on trees (where R1 = 0 and all overlaps = 0, causing `0 >= 0` to misclassify every edge as BOND) while preserving identical results for all non-tree networks.
 
 ## License
 

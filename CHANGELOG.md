@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## v2.1.0 (2026-04-01)
 
+### Added
+- O(1) tree detection (`|E| = |V| - 1`) that bypasses the entire heavy computation pipeline (ego-network construction, 1000 random network generations, R1/R2 threshold computation) for tree-structured networks. Edges are classified directly as SINK (degree-1) or GLOBAL BRIDGE (all others).
+
 ### Fixed
-- Changed the R1 BOND threshold comparison from `>=` to strict `>`, correcting misclassification on tree-like networks where both overlap and R1 equal zero (previously all edges became BOND; now they correctly flow to GLOBAL BRIDGE). This also aligns the R1 operator with R2, which already uses strict `>`. The change has negligible impact on general networks.
+- Incorrect BOND classification on tree networks, where R1 = 0 and all overlaps = 0 caused `0 >= 0` to misclassify every non-SINK edge as BOND. The tree fast-path resolves this while preserving identical results for all 16 benchmark networks.
 
 ## v2.0.1 (2026-03-10)
 
