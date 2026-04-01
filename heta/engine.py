@@ -606,6 +606,7 @@ def run_link_analysis(
             thresholds_r1 = {}
             thresholds_r2 = {}
             actual_times = 0
+            rgs = []
             if progress_callback:
                 progress_callback(times, times, f"Component {compNo}: tree detected, skipping random networks")
         else:
