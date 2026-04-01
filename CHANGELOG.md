@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## v2.1.0 (2026-04-01)
+
+### Fixed
+- Changed the R1 BOND threshold comparison from `>=` to strict `>`, correcting misclassification on tree-like networks where both overlap and R1 equal zero (previously all edges became BOND; now they correctly flow to GLOBAL BRIDGE). This also aligns the R1 operator with R2, which already uses strict `>`. The change has negligible impact on general networks.
+
 ## v2.0.1 (2026-03-10)
 
 Code quality and robustness improvements.
