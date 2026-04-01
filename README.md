@@ -149,7 +149,7 @@ HETA classifies edges through a five-phase pipeline:
 
 4. **Multi-phase classification**
    - **Phase 1 — SINK**: Edges where either endpoint has degree 1.
-   - **Phase 2 — BOND vs LOCAL BRIDGE**: Edges with overlap above R1 are BOND (community-internal). Among those below R1, a secondary threshold R2 (mean &minus; 1&sigma; of the bridge overlap distribution) separates LOCAL BRIDGE from candidates for GLOBAL BRIDGE.
+   - **Phase 2 — BOND vs LOCAL BRIDGE**: Edges with overlap strictly above R1 are BOND (community-internal). Among those below R1, a secondary threshold R2 (mean &minus; 1&sigma; of the bridge overlap distribution) separates LOCAL BRIDGE from candidates for GLOBAL BRIDGE.
    - **Phase 3 — GLOBAL BRIDGE**: All remaining unclassified edges.
 
 5. **Fingerprinting** — Compute the proportion of each edge type to form a 4D network fingerprint, enabling cross-network comparison via correlation and hierarchical clustering.
@@ -216,6 +216,12 @@ See `CITATION.cff` for machine-readable citation metadata.
 ## References
 
 1. Huang, C.-Y., Chin, W. C. B., Fu, Y.-H., & Tsai, Y.-S. (2019). Beyond bond links in complex networks: Local bridges, global bridges and silk links. *Physica A: Statistical Mechanics and its Applications*, 536, 121027. https://doi.org/10.1016/j.physa.2019.04.263
+
+## Changelog
+
+### v2.1.0 (2026-04-01)
+
+- **Fix R1 BOND threshold operator**: Changed the R1 comparison from `>=` to strict `>` (overlap must *strictly exceed* the null-model baseline to qualify as BOND). This corrects the classification behavior on tree-like networks where both the observed overlap and R1 are zero: previously `0 >= 0` incorrectly classified all edges as BOND; now `0 > 0` correctly lets them flow through to GLOBAL BRIDGE. The change has negligible impact on general networks (exact floating-point equality with R1 is extremely rare) and aligns the R1 operator with R2, which already uses strict `>`.
 
 ## License
 

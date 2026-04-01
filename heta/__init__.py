@@ -9,5 +9,5 @@ Original date: 2012/03/01~2012/03/11
 Python 3 port: 2026
 """
 
-__version__ = '2.0'
+__version__ = '2.1.0'
 __author__ = '黃崇源, gscott@mail.cgu.edu.tw'

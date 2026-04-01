@@ -810,8 +810,8 @@ def run_link_analysis(
                 if g[s][t][EDGE_KEY_NEXT_STEP] == STOP:
                     # 已確定的邊：複製前一層的標籤，不重新判斷
                     g[s][t][EDGE_KEY_LAYER + n] = g[s][t][EDGE_KEY_LAYER + str(i)]
-                elif g[s][t][l] >= g.graph[GRAPH_KEY_THRESHOLD_R1 + n]:
-                    # 重疊度 ≥ R1 → BOND
+                elif g[s][t][l] > g.graph[GRAPH_KEY_THRESHOLD_R1 + n]:
+                    # 重疊度 > R1 → BOND
                     g[s][t][EDGE_KEY_LAYER + n] = BOND
                     g[s][t][EDGE_KEY_NEXT_STEP] = STOP
                     g[s][t][EDGE_KEY_WIDTH] = (layers - i + 1) * BOND_BASIC_WIDTH
