@@ -1,4 +1,4 @@
-# HETA — Hierarchical Edge-Type Transition Analysis
+# HETA — Hierarchical Edge Type Analysis
 
 > HETA is a topology-driven tool for classifying every edge in a complex network into one of four structural types (BOND, Silk, Local Bridge, Global Bridge), without requiring any pre-defined community labels or edge weights.
 
@@ -21,8 +21,8 @@
 
 ## Publication
 
-Huang, C.-Y., Fu, Y.-S., & Chin, W.C.B. (2019). Hierarchical edge-type transition analysis for complex network classification. Physica A, 524, 64-75.
-
+Huang, C.-Y., Chin, W. C. B., Fu, Y.-H., & Tsai, Y.-S. (2019). Beyond bond links in complex networks: Local bridges, global bridges and silk links. Physica A, 536, 121027.
+DOI: https://doi.org/10.1016/j.physa.2019.04.263
 
 ## Lab
 
