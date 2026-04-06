@@ -174,6 +174,11 @@ HETA/
 │       ├── suite_experiment_tab.py
 │       ├── plot_canvas.py   # Embedded matplotlib canvas
 │       └── worker.py        # Background worker threads
+├── index.html               # GitHub Pages landing page
+├── 404.html                 # Custom 404 error page
+├── sitemap.xml              # XML sitemap for search engines
+├── robots.txt               # Crawler directives
+├── llms.txt                 # AI-readable project summary
 ├── nets/                    # DEMO sample networks (Pajek .net)
 ├── ws_swn/                  # Watts-Strogatz suite networks
 └── nws_swn/                 # Newman-Watts-Strogatz suite networks
@@ -213,15 +218,9 @@ If you use this software in your research, please cite:
 
 See `CITATION.cff` for machine-readable citation metadata.
 
-## References
-
-1. Huang, C.-Y., Chin, W. C. B., Fu, Y.-H., & Tsai, Y.-S. (2019). Beyond bond links in complex networks: Local bridges, global bridges and silk links. *Physica A: Statistical Mechanics and its Applications*, 536, 121027. https://doi.org/10.1016/j.physa.2019.04.263
-
 ## Changelog
 
-### v2.1.0 (2026-04-01)
-
-- **Tree network fast-path**: Added O(1) tree detection (`|E| = |V| - 1`) before the heavy computation pipeline. Tree-structured networks bypass ego-network construction, random network generation, and R1/R2 threshold computation entirely — edges are classified directly as SINK (degree-1) or GLOBAL BRIDGE (all others). This fixes incorrect BOND classification on trees (where R1 = 0 and all overlaps = 0, causing `0 >= 0` to misclassify every edge as BOND) while preserving identical results for all non-tree networks.
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 

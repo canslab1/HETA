@@ -33,6 +33,7 @@ preferred-citation:
   authors:
     - given-names: Chung-Yuan
       family-names: Huang
+      orcid: "https://orcid.org/0000-0002-8680-6755"
     - given-names: Wei-Chien-Benny
       family-names: Chin
     - given-names: Yu-Hsiang
@@ -45,5 +46,5 @@ preferred-citation:
   journal: "Physica A: Statistical Mechanics and its Applications"
   year: 2019
   volume: '536'
-  pages: '121027'
+  article-number: '121027'
   doi: 10.1016/j.physa.2019.04.263
