@@ -2,14 +2,23 @@
 
 > HETA is a topology-driven tool for classifying every edge in a complex network into one of four structural types (BOND, Silk, Local Bridge, Global Bridge), without requiring any pre-defined community labels or edge weights.
 
-## Author
+## Authors
 
-- Name: Chung-Yuan Huang (黃崇源)
+- Name: Chung-Yuan Huang (黃崇源) (corresponding author)
 - Title: Full Professor, Department of CSIE, Chang Gung University
 - Email: gscott@mail.cgu.edu.tw
 - ORCID: https://orcid.org/0000-0002-8680-6755
 - Google Scholar: https://scholar.google.com/citations?user=0klfzfAAAAAJ&hl=en
 - Homepage: https://canslab1.github.io/
+
+- Name: Wei-Chien-Benny Chin
+- Affiliation: Co-author of the HETA paper
+
+- Name: Yu-Hsiang Fu
+- Affiliation: Co-author of the HETA paper
+
+- Name: Yu-Shiuan Tsai
+- Affiliation: Co-author of the HETA paper
 
 ## Software
 
