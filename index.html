@@ -13,7 +13,13 @@
     <meta name="ahrefs-site-verification" content="b1f1573b895ead5763166ba77346fa86ecb9449ac31144c6786475fa1c2e1e5f">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="theme-color" content="#14532d">
+    <meta name="geo.region" content="TW-TAO">
+    <meta name="geo.placename" content="Guishan, Taoyuan, Taiwan">
+    <meta name="geo.position" content="25.0375;121.3892">
+    <meta name="ICBM" content="25.0375, 121.3892">
     <title>HETA — Hierarchical Edge Type Analysis | CANS Lab</title>
     <meta name="description" content="Hierarchical Edge Type Analysis for classifying edges in complex networks　異質邊類型分析工具（HETA），用於無向複雜網路中連結類型的分類與社群偵測。">
     <meta name="author" content="Prof. Chung-Yuan Huang (黃崇源教授)">
@@ -28,11 +34,18 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="HETA edge classification showing bond, sink, local bridge and global bridge types">
+    <meta property="og:see_also" content="https://github.com/canslab1/HETA">
+    <meta property="og:see_also" content="https://canslab1.github.io/">
+    <meta property="og:see_also" content="https://doi.org/10.1016/j.physa.2019.04.263">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="HETA — Hierarchical Edge Type Analysis | CANS Lab">
     <meta name="twitter:description" content="Hierarchical Edge Type Analysis for classifying edges in complex networks">
     <meta name="twitter:image" content="https://canslab1.github.io/images/software/heta-community.png">
     <meta name="twitter:image:alt" content="HETA edge classification showing bond, sink, local bridge and global bridge types">
+    <meta name="twitter:label1" content="Language">
+    <meta name="twitter:data1" content="Python">
+    <meta name="twitter:label2" content="License">
+    <meta name="twitter:data2" content="MIT">
     <meta name="keywords" content="HETA, edge classification, complex networks, local bridge, global bridge, CANS Lab, 黃崇源, 長庚大學, 網路分析, 連結類型, 社群偵測, 複雜網絡, 社會網路">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
     <link rel="canonical" href="https://canslab1.github.io/HETA/">
@@ -40,6 +53,7 @@
     <link rel="alternate" hreflang="x-default" href="https://canslab1.github.io/HETA/">
     <link rel="alternate" hreflang="zh-TW" href="https://canslab1.github.io/HETA/">
     <link rel="icon" href="https://canslab1.github.io/images/csie.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://canslab1.github.io/images/icon-192.png" sizes="192x192">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -93,6 +107,53 @@
         ]
     }
     </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "CANS Lab", "item": "https://canslab1.github.io/" },
+            { "@type": "ListItem", "position": 2, "name": "HETA", "item": "https://canslab1.github.io/HETA/" }
+        ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "name": "Beyond bond links in complex networks: Local bridges, global bridges and silk links",
+        "headline": "Beyond bond links in complex networks: Local bridges, global bridges and silk links",
+        "author": [
+            { "@type": "Person", "name": "Chung-Yuan Huang", "@id": "https://canslab1.github.io/#person" },
+            { "@type": "Person", "name": "Wei-Chien-Benny Chin" },
+            { "@type": "Person", "name": "Yu-Hsiang Fu" },
+            { "@type": "Person", "name": "Yu-Shiuan Tsai" }
+        ],
+        "datePublished": "2019",
+        "isPartOf": { "@type": "Periodical", "name": "Physica A: Statistical Mechanics and its Applications" },
+        "volumeNumber": "536",
+        "pageStart": "121027",
+        "url": "https://doi.org/10.1016/j.physa.2019.04.263",
+        "sameAs": "https://doi.org/10.1016/j.physa.2019.04.263",
+        "publisher": { "@type": "Organization", "name": "Elsevier" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ResearchOrganization",
+        "name": "Complex Adaptive Networks and Systems Laboratory",
+        "alternateName": ["CANS Lab", "複雜適應性網絡與系統實驗室"],
+        "url": "https://canslab1.github.io/",
+        "parentOrganization": {
+            "@type": "CollegeOrUniversity",
+            "name": "Chang Gung University",
+            "alternateName": "長庚大學",
+            "url": "https://www.cgu.edu.tw/"
+        },
+        "member": { "@type": "Person", "@id": "https://canslab1.github.io/#person" }
+    }
+    </script>
 
     <!-- Dublin Core -->
     <meta name="DC.title" content="HETA — Hierarchical Edge Type Analysis">
@@ -106,14 +167,34 @@
     <meta name="DC.identifier" content="https://canslab1.github.io/HETA/">
     <meta name="DC.date" content="2026-04-01">
     <meta name="DC.rights" content="MIT License">
+    <meta name="DCTERMS.modified" content="2026-04-01">
+    <meta name="DC.coverage" content="Taiwan; International">
+    <meta name="DC.contributor" content="Wei-Chien-Benny Chin; Yu-Hsiang Fu; Yu-Shiuan Tsai">
+    <meta name="DC.relation" content="https://github.com/canslab1/HETA">
+    <meta name="DC.relation" content="https://canslab1.github.io/">
+    <meta name="DC.relation" content="https://doi.org/10.1016/j.physa.2019.04.263">
+    <meta name="DCTERMS.audience" content="Researchers; Graduate Students; Network Scientists">
 
     <!-- Highwire Press (Google Scholar) -->
+    <meta name="citation_title" content="Beyond bond links in complex networks: Local bridges, global bridges and silk links">
     <meta name="citation_author" content="Huang, Chung-Yuan">
     <meta name="citation_author" content="黃崇源">
     <meta name="citation_author_institution" content="Chang Gung University">
     <meta name="citation_author_orcid" content="0000-0002-8680-6755">
+    <meta name="citation_author" content="Chin, Wei-Chien-Benny">
+    <meta name="citation_author_institution" content="University of Malaya">
+    <meta name="citation_author" content="Fu, Yu-Hsiang">
+    <meta name="citation_author_institution" content="Chang Gung University">
+    <meta name="citation_author" content="Tsai, Yu-Shiuan">
+    <meta name="citation_author_institution" content="Chang Gung University">
+    <meta name="citation_journal_title" content="Physica A: Statistical Mechanics and its Applications">
+    <meta name="citation_volume" content="536">
+    <meta name="citation_firstpage" content="121027">
+    <meta name="citation_publication_date" content="2019">
+    <meta name="citation_doi" content="10.1016/j.physa.2019.04.263">
 
     <link rel="author" href="https://canslab1.github.io/humans.txt">
+    <link rel="security" type="text/plain" href="https://canslab1.github.io/security.txt">
 </head>
 <body>
     <a href="#content" class="skip-link">Skip to content</a>
@@ -123,7 +204,7 @@
                 <img src="https://canslab1.github.io/images/csie.png" alt="CANS Lab logo" width="32" height="32">
                 <span>CANS Lab</span>
             </a>
-            <nav class="header-nav">
+            <nav class="header-nav" aria-label="HETA navigation">
                 <a href="https://canslab1.github.io/">Lab Home</a>
                 <a href="https://github.com/canslab1/HETA" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
             </nav>
@@ -427,7 +508,7 @@ Options:
 <!-- PRERENDER-END -->
         </article>
     </main>
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <p>&copy; CANS Lab, Chang Gung University &middot;
            <a href="https://canslab1.github.io/">canslab1.github.io</a></p>
     </footer>
